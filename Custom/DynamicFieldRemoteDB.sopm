@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="1.0">
+    <Name>DynamicFieldRemoteDB</Name>
+    <Version>6.0.0</Version>
+    <Framework>6.0.x</Framework>
+    <Vendor>Ligero</Vendor>
+    <URL>http://www.perl-services.de</URL>
+    <Description Lang="de">DynamicField-Backend zur Bereitstellung des Zugangs zu Datenbanken fuer OTRS</Description>
+    <Description Lang="en">DynamicField backend to provide access to RemoteDB for OTRS</Description>
+    <Description Lang="pt-BR">DynamicField que permite acesso a um Banco de Dados Remoto através do OTRS/Ligero</Description>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <Filelist>
+        <File Permission="644" Location="Custom/DynamicFieldRemoteDB.sopm"></File>
+        <File Permission="644" Location="Kernel/Config/Files/XML/DynamicFieldRemoteDB.xml"></File>
+        <File Permission="644" Location="Kernel/Language/de_DynamicFieldRemoteDB.pm"></File>
+        <File Permission="644" Location="Kernel/Language/pt_BR_DynamicFieldRemoteDB.pm"></File>
+        <File Permission="644" Location="Kernel/Modules/AdminDynamicFieldRemoteDB.pm"></File>
+        <File Permission="644" Location="Kernel/Modules/DynamicFieldRemoteDBAJAXHandler.pm"></File>
+        <File Permission="644" Location="Kernel/System/DynamicField/Driver/RemoteDB.pm"></File>
+        <File Permission="644" Location="Kernel/System/DFRemoteDB.pm"></File>
+        <File Permission="644" Location="var/packagesetup/DynamicFieldRemoteDB.pm"></File>
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminDynamicFieldRemoteDB.tt"></File>
+        <File Permission="644" Location="var/httpd/htdocs/js/Core.Agent.Admin.DynamicFieldRemoteDB.js"></File>
+    </Filelist>
+    <CodeInstall Type="post"><![CDATA[
+        $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeInstall();
+    ]]></CodeInstall>
+    <CodeUninstall Type="post"><![CDATA[
+        $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeUninstall();
+    ]]></CodeUninstall>
+    <CodeReinstall Type="post"><![CDATA[
+        $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeReinstall();
+    ]]></CodeReinstall>
+    <CodeUpgrade Type="post"><![CDATA[
+        $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeUpgrade();
+    ]]></CodeUpgrade>
+    <CodeUpgrade Type="post" Version="4.99.80"><![CDATA[
+        $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeUpgrade_5();
+    ]]></CodeUpgrade>
+    <CodeUpgrade Type="post" Version="5.0.1"><![CDATA[
+        $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeUpgrade_5_0_1();
+    ]]></CodeUpgrade>
+    <IntroInstall Type="post" Lang="en" Title="Install Information"><![CDATA[
+            <strong>WELCOME</strong><br />
+<br />
+You are about to install the OTRS module DynamicFieldITSMConfigItem.<br />
+<br />
+<strong>Important Advice:</strong><br />
+<br />
+It is recommended to delete the OTRS-cache and perform a configuration rebuild before you continue the use of this OTRS installation.
+    ]]></IntroInstall>
+    <IntroUpgrade Type="post" Lang="en" Title="Install Information"><![CDATA[
+            <strong>WELCOME</strong><br />
+<br />
+You are about to install the OTRS module DynamicFieldITSMConfigItem.<br />
+<br />
+<strong>Important Advice:</strong><br />
+<br />
+<br />
+It is recommended to delete the OTRS-cache and perform a configuration rebuild before you continue the use of this OTRS installation.
+    ]]></IntroUpgrade>
+</otrs_package>
