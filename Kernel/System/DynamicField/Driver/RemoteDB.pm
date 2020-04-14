@@ -239,11 +239,22 @@ sub ValueLookup {
             $QueryCondition = "";
         }
 
+        my $Distinct = "";
+        if($Param{DynamicFieldConfig}->{Config}->{UseDESTINCT}){
+            $Distinct = " DISTINCT ";
+        }
+
         my $SQL = 'SELECT '
             . $Param{DynamicFieldConfig}->{Config}->{DatabaseFieldValue}
+            . $Distinct
             . ' FROM '
             . $Param{DynamicFieldConfig}->{Config}->{DatabaseTable}
             . $QueryCondition;
+
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU AQUI 5 ".$SQL,
+                );
 
         my $Success = $DFRemoteDBObject->Prepare(
             SQL   => $SQL,
@@ -537,7 +548,8 @@ END
                     Data.push({
                         key:   this.Key,
                         value: this.Value,
-                        title: this.Title
+                        title: this.Title,
+                        aditionalFields: this.AditionalField
                     });
                 });
                 \$('#$AutoCompleteFieldName').data('AutoCompleteData', Data);
@@ -548,6 +560,13 @@ END
             }));
         },
         select: function (Event, UI) {
+            console.log("EU AQUI ",UI);
+            if(UI.item.aditionalFields.length > 0){
+                for (let field of UI.item.aditionalFields) {
+                    \$('#'+field.field).val(field.value);
+                }
+                console.log("Length é maior que 0 ");
+            }
             $IDCounterName++;
             \$('#$ContainerFieldName').append(
                 '<div class="InputField_Selection" style="display:block;position:inherit;top:0px;">'

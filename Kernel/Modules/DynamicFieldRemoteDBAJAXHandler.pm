@@ -250,10 +250,39 @@ sub Run {
 
                 if ($ConstrictionsCheck) {
 
+                    my $Distinct = "";
+
+                    if($DynamicFieldConfig->{Config}->{UseDISTINCT}){
+                        $Distinct = " DISTINCT ";
+                    }
+
+
+                    use Data::Dumper;
+                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        Priority => 'error',
+                        Message  => " PossibleValues ".Dumper($DynamicFieldConfig->{Config}->{PossibleValues}),
+                    );
+
+                    my $AdictionalFields = "";
+
+                    if($DynamicFieldConfig->{Config}->{PossibleValues}){
+                        foreach my $key (sort keys %{$DynamicFieldConfig->{Config}->{PossibleValues}}) {
+                            my $value =  $DynamicFieldConfig->{Config}->{PossibleValues}->{$key};
+                            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                Priority => 'error',
+                                Message  => " Key ".$key." Value ".$value,
+                            );
+
+                            $AdictionalFields = $AdictionalFields.",".$value;
+                        }
+                    }
+
                     my $SQL = 'SELECT '
+                        . $Distinct
                         . $DynamicFieldConfig->{Config}->{DatabaseFieldKey}
                         . ', '
                         . $DynamicFieldConfig->{Config}->{DatabaseFieldValue}
+                        . $AdictionalFields
                         . ' FROM '
                         . $DynamicFieldConfig->{Config}->{DatabaseTable}
                         . ' WHERE '
@@ -295,11 +324,25 @@ sub Run {
                                 $Title .= ' (' . $Key . ')';
                             }
 
-                            push @PossibleValues, {
+                            my $result = {
                                 Key    => $Key,
                                 Value  => $Value,
                                 Title  => $Title,
+                                AditionalField => []
                             };
+
+                            if($DynamicFieldConfig->{Config}->{PossibleValues}){
+                                my $count = 2;
+                                foreach my $key (sort keys %{$DynamicFieldConfig->{Config}->{PossibleValues}}) {
+                                    push $result->{"AditionalField"},{
+                                        field => "DynamicField_".$key,
+                                        value => $Row[$count]
+                                    };
+                                    $count = $count +1;
+                                }
+                            }
+
+                            push @PossibleValues, $result;
                             last RESULT if ($MaxCount == ($DynamicFieldConfig->{Config}->{MaxQueryResult} || 10));
                             $MaxCount++;
                         }
@@ -441,12 +484,24 @@ sub Run {
 
             if ($ConstrictionsCheck) {
 
+                my $Distinct = "";
+
+                if( $DynamicFieldConfig->{Config}->{UseDISTINCT} ){
+                    $Distinct = " DISTINCT ";
+                }
+
                 my $SQL = 'SELECT '
+                    . $Distinct
                     . $DynamicFieldConfig->{Config}->{DatabaseFieldKey}
                     . ' FROM '
                     . $DynamicFieldConfig->{Config}->{DatabaseTable}
                     . ' WHERE '
                     . $QueryCondition;
+
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU AQUI 7 ".$SQL,
+                );
 
                 # create cache object
                 if ( $DynamicFieldConfig->{Config}->{CacheTTL} ) {

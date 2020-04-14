@@ -135,6 +135,7 @@ sub _AddAction {
     my %GetParam;
 
     my $UseOTRSDB =  $Self->{ParamObject}->GetParam( Param => 'UseOTRSDB');
+    my $UseDISTINCT =  $Self->{ParamObject}->GetParam( Param => 'UseDISTINCT');
 
     my @Needed = qw(Name Label FieldOrder MaxArraySize DatabaseTable DatabaseFieldKey);
     if ( !$UseOTRSDB ) {
@@ -282,6 +283,7 @@ sub _AddAction {
         MaxArraySize        => $GetParam{MaxArraySize}        || 1,
         CacheTTL            => $GetParam{CacheTTL}            || 0,
         UseOTRSDB           => $UseOTRSDB                     || 0,
+        UseDISTINCT         => $UseDISTINCT                   || 0,
         CachePossibleValues => $GetParam{CachePossibleValues} || 0,
         ShowKeyInTitle      => $GetParam{ShowKeyInTitle}      || 0,
         ItemSeparator       => $GetParam{ItemSeparator}       || ', ',
@@ -379,6 +381,7 @@ sub _ChangeAction {
     my %GetParam;
 
     my $UseOTRSDB =  $Self->{ParamObject}->GetParam( Param => 'UseOTRSDB');
+    my $UseDISTINCT =  $Self->{ParamObject}->GetParam( Param => 'UseDISTINCT');
 
     my @Needed = qw(Name Label FieldOrder MaxArraySize DatabaseTable DatabaseFieldKey);
     if ( !$UseOTRSDB ) {
@@ -563,6 +566,7 @@ sub _ChangeAction {
         MaxArraySize        => $GetParam{MaxArraySize}        || 1,
         CacheTTL            => $GetParam{CacheTTL}            || 0,
         UseOTRSDB           => $UseOTRSDB                     || 0,
+        UseDISTINCT         => $UseDISTINCT                   || 0,
         CachePossibleValues => $GetParam{CachePossibleValues} || 0,
         ShowKeyInTitle      => $GetParam{ShowKeyInTitle}      || 0,
         ItemSeparator       => $GetParam{ItemSeparator}       || ', ',
@@ -633,6 +637,7 @@ sub _ShowScreen {
     $Param{CaseSensitive}       = $Param{Config}->{CaseSensitive};
     $Param{DefaultValues}       = $Param{Config}->{DefaultValues}       || [];
     $Param{UseOTRSDB}           = $Param{Config}->{UseOTRSDB};
+    $Param{UseDISTINCT}         = $Param{Config}->{UseDISTINCT};
 
     # header
     my $Output = $Self->{LayoutObject}->Header();
@@ -949,6 +954,7 @@ sub _DefaultValueSearch {
     my $SearchSuffix        = $Self->{ParamObject}->GetParam( Param => 'SearchSuffix' )        || '';
     my $DatabaseTable       = $Self->{ParamObject}->GetParam( Param => 'DatabaseTable' )       || '';
     my $CaseSensitive       = $Self->{ParamObject}->GetParam( Param => 'CaseSensitive' )       || '';
+    my $UseDISTINCT         = $Self->{ParamObject}->GetParam( Param => 'UseDISTINCT' )         ;
 
     my $DFRemoteDBObject;
     if (
@@ -1022,8 +1028,14 @@ sub _DefaultValueSearch {
             }
         }
 
+        my $Distinct = "";
+        if($UseDISTINCT){
+            $Distinct = " DISTINCT ";
+        }
+
         my $SQL = 'SELECT '
             . $DatabaseFieldKey
+            . $Distinct
             . ', '
             . $DatabaseFieldValue
             . ', '
@@ -1032,6 +1044,11 @@ sub _DefaultValueSearch {
             . $DatabaseTable
             . ' WHERE '
             . $QueryCondition;
+        
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU AQUI 8 ".$SQL,
+                );
 
             my $Success = $DFRemoteDBObject->Prepare(
                 SQL   => $SQL,

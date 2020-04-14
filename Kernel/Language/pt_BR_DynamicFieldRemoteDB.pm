@@ -111,6 +111,12 @@ sub Data {
     $Lang->{'Whitespace ( )'} = 'Espaço em branco ( )';
 
     $Lang->{'Additional fields'} = 'Campos adicionais';
+    $Lang->{'Dynamic Field'} = 'Campo Dinâmico';
+    $Lang->{'Table Column'} = 'Coluna da Tabela';
+    $Lang->{'Add field'} = 'Adicionar campo';
+
+    $Lang->{'Use DISTINCT'} = 'Usar DISTINCT';
+    $Lang->{'Use DISTINCT Clause in Query.'} = 'Usar a cláusula DISTINCT nas pesquisas.';
 
     return 0;
 
