@@ -118,6 +118,12 @@ sub Data {
     $Lang->{'Use DISTINCT'} = 'Usar DISTINCT';
     $Lang->{'Use DISTINCT Clause in Query.'} = 'Usar a cláusula DISTINCT nas pesquisas.';
 
+    $Lang->{'Just save description'} = 'Armazenar somente a descrição';
+    $Lang->{'Just save the description value in OTRS.'} = 'Armazenar somente a descrição no OTRS.';
+
+    $Lang->{'Additional Fields as Read Only'} = 'Campos adicionais como somente leitura';
+    $Lang->{'Define all additional as ready only.'} = 'Define todos os campos adicionais como somente leitura.';
+
     return 0;
 
     # $$STOP$$

@@ -134,6 +134,11 @@ sub ValueGet {
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO ValueSet ",
+                );
+
     # check value
     my @Values;
     if ( ref $Param{Value} eq 'ARRAY' ) {
@@ -177,6 +182,11 @@ sub ValueSet {
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO ValueLookup ",
+                );
+
     return if (!defined ($Param{Key}));
     return '' if ($Param{Key} eq '');
 
@@ -209,6 +219,14 @@ sub ValueLookup {
     for my $Key ( @Keys ){
 
         my $QuotedValue = $DFRemoteDBObject->Quote($Key);
+
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " QUOTE VALUE ".$QuotedValue,
+                );
+        if( $Param{DynamicFieldConfig}->{Config}->{SaveDescription} ){
+            return $QuotedValue;
+        }
 
         # check if value is in cache
         if ( $Param{DynamicFieldConfig}->{Config}->{CacheTTL} ) {
@@ -296,6 +314,11 @@ sub ValueLookup {
 sub ValueIsDifferent {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO ValueIsDifferent ",
+                );
+
     # special cases where the values are different but they should be reported as equals
     if (
         !defined $Param{Value1}
@@ -323,6 +346,11 @@ sub ValueIsDifferent {
 
 sub ValueValidate {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO ValueValidate ",
+                );
 
     # check value
     my @Values;
@@ -352,6 +380,11 @@ sub ValueValidate {
 sub PossibleValuesGet {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO PossibleValuesGet ",
+                );
+
     # to store the possible values
     my $PossibleValues = $Self->_GetPossibleValues(%Param);
 
@@ -361,6 +394,11 @@ sub PossibleValuesGet {
 
 sub TemplateValueTypeGet {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO TemplateValueTypeGet ",
+                );
 
     my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
 
@@ -389,6 +427,11 @@ sub TemplateValueTypeGet {
 
 sub EditFieldRender {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO EditFieldRender ",
+                );
 
     # take config from field config
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
@@ -493,6 +536,7 @@ END
         </div>
 END
         $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
+            
             \$('#$ValueFieldName$ValueCounter').siblings('div.Remove').find('a').bind('click', function() {
                 \$('#$ValueFieldName$ValueCounter').parent().remove();
                 if (\$('.InputField_Selection > input[name=$FieldName]').length == 0) {
@@ -520,6 +564,16 @@ END
         <div class="Clear"></div>
     </div>
 END
+
+    if($Param{DynamicFieldConfig}->{Config}->{AdditionalFieldRO}){
+        if($Param{DynamicFieldConfig}->{Config}->{PossibleValues}){
+            foreach my $key (sort keys %{$Param{DynamicFieldConfig}->{Config}->{PossibleValues}}) {
+                $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
+                \$('#DynamicField_$key').attr('readonly', true);
+END
+            }
+        }
+    }
 
     $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
     var $IDCounterName = $ValueCounter;
@@ -549,7 +603,8 @@ END
                         key:   this.Key,
                         value: this.Value,
                         title: this.Title,
-                        aditionalFields: this.AditionalField
+                        aditionalFields: this.AditionalField,
+                        saveDescription: this.SaveDescription
                     });
                 });
                 \$('#$AutoCompleteFieldName').data('AutoCompleteData', Data);
@@ -596,7 +651,8 @@ END
                 if (\$('.InputField_Selection > input[name=$FieldName]').length < $MaxArraySize) {
                     \$('#$AutoCompleteFieldName').show();
                 }
-                \$('#$FieldName').trigger('change');
+                if(UI.item.saveDescription == 0)
+                    \$('#$FieldName').trigger('change');
                 return false;
             });
             \$('#$ContainerFieldName').show();
@@ -605,7 +661,8 @@ END
             if (\$('.InputField_Selection > input[name=$FieldName]').length >= $MaxArraySize) {
                 \$('#$AutoCompleteFieldName').hide();
             }
-            \$('#$FieldName').trigger('change');
+            if(UI.item.saveDescription == 0)
+                \$('#$FieldName').trigger('change');
             Event.preventDefault();
             return false;
         },
@@ -843,6 +900,11 @@ END
 sub EditFieldValueGet {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO EditFieldValueGet ",
+                );
+
     my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
 
     my $Value;
@@ -888,6 +950,11 @@ sub EditFieldValueGet {
 sub EditFieldValueValidate {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO EditFieldValueValidate ",
+                );
+
     # get the field value from the http request
     my $Values = $Self->EditFieldValueGet(
         DynamicFieldConfig => $Param{DynamicFieldConfig},
@@ -897,6 +964,12 @@ sub EditFieldValueValidate {
         ReturnValueStructure => 1,
     );
 
+    use Data::Dumper;
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO EditFieldValueValidate ".Dumper($Param{DynamicFieldConfig}),
+                );
+
     my $ServerError;
     my $ErrorMessage;
 
@@ -905,6 +978,15 @@ sub EditFieldValueValidate {
         return {
             ServerError => 1,
         };
+    }
+
+    if($Param{DynamicFieldConfig}->{Config}->{SaveDescription}){
+        my $Result = {
+            ServerError  => $ServerError,
+            ErrorMessage => $ErrorMessage,
+        };
+
+        return $Result;
     }
 
     # get possible values list
@@ -932,11 +1014,22 @@ sub EditFieldValueValidate {
         ErrorMessage => $ErrorMessage,
     };
 
+    use Data::Dumper;
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO EditFieldValueValidate ".Dumper($Result),
+                );
+
     return $Result;
 }
 
 sub SearchFieldRender {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO SearchFieldRender ",
+                );
 
     # take config from field config
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
@@ -1156,6 +1249,11 @@ END
 sub SearchFieldValueGet {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO SearchFieldValueGet ",
+                );
+
     my $Value;
 
     # get dynamic field value from param object
@@ -1186,6 +1284,11 @@ sub SearchFieldValueGet {
 
 sub SearchFieldParameterBuild {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO SearchFieldParameterBuild ",
+                );
 
     # get field value
     my $Value = $Self->SearchFieldValueGet(%Param);
@@ -1236,6 +1339,11 @@ sub SearchFieldParameterBuild {
 sub SearchSQLGet {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO SearchSQLGet ",
+                );
+
     my %Operators = (
         Equals            => '=',
         GreaterThan       => '>',
@@ -1274,11 +1382,21 @@ sub SearchSQLGet {
 sub SearchSQLOrderFieldGet {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO SearchSQLOrderFieldGet ",
+                );
+
     return "$Param{TableAlias}.value_text";
 }
 
 sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO ReadableValueRender ",
+                );
 
     # set Value and Title variables
     my $Value = '';
@@ -1328,6 +1446,11 @@ sub ReadableValueRender {
 
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO DisplayValueRender ",
+                );
 
     # set HTMLOuput as default if not specified
     if ( !defined $Param{HTMLOutput} ) {
@@ -1468,6 +1591,11 @@ sub DisplayValueRender {
 sub StatsFieldParameterBuild {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO StatsFieldParameterBuild ",
+                );
+
     # set PossibleValues
     my $Values = $Self->PossibleValuesGet(%Param);
 
@@ -1502,6 +1630,11 @@ sub StatsFieldParameterBuild {
 sub StatsSearchFieldParameterBuild {
     my ( $Self, %Param ) = @_;
 
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO StatsSearchFieldParameterBuild ",
+                );
+
     my $Operator = 'Equals';
     my $Value    = $Param{Value};
 
@@ -1512,6 +1645,11 @@ sub StatsSearchFieldParameterBuild {
 
 sub ColumnFilterValuesGet {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO ColumnFilterValuesGet ",
+                );
 
     # take config from field config
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
@@ -1537,6 +1675,11 @@ sub ColumnFilterValuesGet {
 
 sub _GetPossibleValues {
     my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => " CHEGOU NO _GetPossibleValues ",
+                );
 
     my $PossibleValues;
 

@@ -324,12 +324,22 @@ sub Run {
                                 $Title .= ' (' . $Key . ')';
                             }
 
+                            my $SaveDescription = 0;
+                            if ( $DynamicFieldConfig->{Config}->{SaveDescription} ) {
+                                $SaveDescription = 1;
+                            }
+
                             my $result = {
                                 Key    => $Key,
                                 Value  => $Value,
                                 Title  => $Title,
-                                AditionalField => []
+                                AditionalField => [],
+                                SaveDescription => $SaveDescription
                             };
+
+                            if($DynamicFieldConfig->{Config}->{SaveDescription}){
+                                $result->{Key} = $Value;
+                            }
 
                             if($DynamicFieldConfig->{Config}->{PossibleValues}){
                                 my $count = 2;

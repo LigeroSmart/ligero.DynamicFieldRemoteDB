@@ -189,6 +189,12 @@ $('#DatabaseTable').bind('change', function (Event) {
                             <p class="FieldExplanation">[% Translate("Use DISTINCT Clause in Query.") | html %]</p>
                         </div>
                         <div class="Clear"></div>
+                        <label for="SaveDescription">[% Translate("Just save description") | html %]:</label>
+                        <div class="Field">
+                            <input id="SaveDescription" class="W25pc" type="checkbox"  value="1" [% IF Data.SaveDescription %]checked="checked"[% END %] name="SaveDescription">
+                            <p class="FieldExplanation">[% Translate("Just save the description value in OTRS.") | html %]</p>
+                        </div>
+                        <div class="Clear"></div>
                         <label class="Mandatory" for="DatabaseFieldKey"><span class="Marker">*</span> [% Translate("DatabaseFieldKey") | html %]:</label>
                         <div class="Field">
                             <input id="DatabaseFieldKey" class="W25pc Validate_Required [% Data.DatabaseFieldKeyServerError | html %]" type="text"  value="[% Data.DatabaseFieldKey | html %]" name="DatabaseFieldKey">
@@ -530,6 +536,12 @@ if ($('input[name=DefaultValues]').length >= $('#MaxArraySize').val()) {
                             <a href="#" id="AddValue" class="AddButton"><i class="fa fa-plus-square-o"></i><span class="InvisibleText">[% Translate("Add Value") | html %]</span></a>
                         </div>
                         <div class="Clear"></div>
+                        <label for="AdditionalFieldRO">[% Translate("Additional Fields as Read Only") | html %]:</label>
+                        <div class="Field">
+                            <input id="AdditionalFieldRO" class="W25pc" type="checkbox"  value="1" [% IF Data.AdditionalFieldRO %]checked="checked"[% END %] name="AdditionalFieldRO">
+                            <p class="FieldExplanation">[% Translate("Define all additional as ready only.") | html %]</p>
+                        </div>
+                        <div class="Clear"></div>
                     </fieldset>
                 </div>
 
@@ -542,6 +554,7 @@ if ($('input[name=DefaultValues]').length >= $('#MaxArraySize').val()) {
                     <a href="[% Env("Baselink") %]Action=AdminDynamicField">[% Translate("Cancel") | html %]</a>
                 </div>
                 <div class="Clear"></div>
+                
             </fieldset>
         </form>
     </div>

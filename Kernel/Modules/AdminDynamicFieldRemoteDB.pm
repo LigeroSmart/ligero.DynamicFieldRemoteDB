@@ -136,6 +136,8 @@ sub _AddAction {
 
     my $UseOTRSDB =  $Self->{ParamObject}->GetParam( Param => 'UseOTRSDB');
     my $UseDISTINCT =  $Self->{ParamObject}->GetParam( Param => 'UseDISTINCT');
+    my $SaveDescription =  $Self->{ParamObject}->GetParam( Param => 'SaveDescription');
+    my $AdditionalFieldRO = $Self->{ParamObject}->GetParam( Param => 'AdditionalFieldRO' );
 
     my @Needed = qw(Name Label FieldOrder MaxArraySize DatabaseTable DatabaseFieldKey);
     if ( !$UseOTRSDB ) {
@@ -284,6 +286,8 @@ sub _AddAction {
         CacheTTL            => $GetParam{CacheTTL}            || 0,
         UseOTRSDB           => $UseOTRSDB                     || 0,
         UseDISTINCT         => $UseDISTINCT                   || 0,
+        SaveDescription         => $SaveDescription                   || 0,
+        AdditionalFieldRO   => $AdditionalFieldRO             || 0,
         CachePossibleValues => $GetParam{CachePossibleValues} || 0,
         ShowKeyInTitle      => $GetParam{ShowKeyInTitle}      || 0,
         ItemSeparator       => $GetParam{ItemSeparator}       || ', ',
@@ -382,6 +386,8 @@ sub _ChangeAction {
 
     my $UseOTRSDB =  $Self->{ParamObject}->GetParam( Param => 'UseOTRSDB');
     my $UseDISTINCT =  $Self->{ParamObject}->GetParam( Param => 'UseDISTINCT');
+    my $SaveDescription =  $Self->{ParamObject}->GetParam( Param => 'SaveDescription');
+    my $AdditionalFieldRO = $Self->{ParamObject}->GetParam( Param => 'AdditionalFieldRO');
 
     my @Needed = qw(Name Label FieldOrder MaxArraySize DatabaseTable DatabaseFieldKey);
     if ( !$UseOTRSDB ) {
@@ -567,6 +573,8 @@ sub _ChangeAction {
         CacheTTL            => $GetParam{CacheTTL}            || 0,
         UseOTRSDB           => $UseOTRSDB                     || 0,
         UseDISTINCT         => $UseDISTINCT                   || 0,
+        SaveDescription         => $SaveDescription                   || 0,
+        AdditionalFieldRO   => $AdditionalFieldRO             || 0,
         CachePossibleValues => $GetParam{CachePossibleValues} || 0,
         ShowKeyInTitle      => $GetParam{ShowKeyInTitle}      || 0,
         ItemSeparator       => $GetParam{ItemSeparator}       || ', ',
@@ -638,6 +646,8 @@ sub _ShowScreen {
     $Param{DefaultValues}       = $Param{Config}->{DefaultValues}       || [];
     $Param{UseOTRSDB}           = $Param{Config}->{UseOTRSDB};
     $Param{UseDISTINCT}         = $Param{Config}->{UseDISTINCT};
+    $Param{SaveDescription}         = $Param{Config}->{SaveDescription};
+    $Param{AdditionalFieldRO}   = $Param{Config}->{AdditionalFieldRO};
 
     # header
     my $Output = $Self->{LayoutObject}->Header();
@@ -925,6 +935,7 @@ sub _ShowScreen {
             ShowKeyInTitleStrg      => $ShowKeyInTitleStrg,
             CaseSensitiveStrg       => $CaseSensitiveSelectionStrg,
             DefaultValuesCount      => $DefaultValuesCount,
+            ValueCounter           => $ValueCounter,
         }
     );
 
@@ -955,6 +966,8 @@ sub _DefaultValueSearch {
     my $DatabaseTable       = $Self->{ParamObject}->GetParam( Param => 'DatabaseTable' )       || '';
     my $CaseSensitive       = $Self->{ParamObject}->GetParam( Param => 'CaseSensitive' )       || '';
     my $UseDISTINCT         = $Self->{ParamObject}->GetParam( Param => 'UseDISTINCT' )         ;
+    my $SaveDescription         = $Self->{ParamObject}->GetParam( Param => 'SaveDescription' )         ;
+    my $AdditionalFieldRO   = $Self->{ParamObject}->GetParam( Param => 'AdditionalFieldRO');
 
     my $DFRemoteDBObject;
     if (
