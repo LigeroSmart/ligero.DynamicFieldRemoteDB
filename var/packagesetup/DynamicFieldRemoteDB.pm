@@ -1,20 +1,3 @@
-# --
-# DynamicFieldRemoteDB.pm - code run during package de-/installation
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-# Maintenance 2018 - Perl-Services.de, http://perl-services.de
-#
-# written/edited by:
-# * Torsten(dot)Thau(at)cape(dash)it(dot)de
-# * Anna(dot)Litvinova(at)cape(dash)it(dot)de
-# * Mario(dot)Illinger(at)cape(dash)it(dot)de
-#
-# --
-# $Id: DynamicFieldRemoteDB.pm,v 1.10 2016/06/30 05:53:08 millinger Exp $
-# --
-# This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
-# --
 
 package var::packagesetup::DynamicFieldRemoteDB;
 

@@ -1,16 +1,3 @@
-# --
-# Kernel/Modules/AdminDynamicFieldRemoteDB.pm - provides a dynamic fields config view for admins
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Mario(dot)Illinger(at)cape(dash)it(dot)de
-# --
-# $Id: AdminDynamicFieldRemoteDB.pm,v 1.17 2016/05/30 13:20:18 millinger Exp $
-# --
-# This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
-# --
 
 package Kernel::Modules::AdminDynamicFieldRemoteDB;
 
@@ -842,12 +829,6 @@ sub _ShowScreen {
         %PossibleValues = %{ $Param{PossibleValues} };
     }
 
-    use Data::Dumper;
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
-        Priority => 'error',
-        Message  => " POSSIBLE VALUES ".Dumper(\%PossibleValues),
-    );
-
     # output the possible values and errors within (if any)
     for my $Key ( sort keys %PossibleValues ) {
 
@@ -895,11 +876,6 @@ sub _ShowScreen {
                 $ValueError = 'ServerError';
             }
         }
-
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => " Key ".Dumper($Key),
-        );
 
         # create a value map row
         $Self->{LayoutObject}->Block(
@@ -1057,11 +1033,6 @@ sub _DefaultValueSearch {
             . $DatabaseTable
             . ' WHERE '
             . $QueryCondition;
-        
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => " CHEGOU AQUI 8 ".$SQL,
-                );
 
             my $Success = $DFRemoteDBObject->Prepare(
                 SQL   => $SQL,

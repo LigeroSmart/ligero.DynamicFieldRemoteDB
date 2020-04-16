@@ -1,18 +1,3 @@
-# --
-# Kernel/System/DFRemoteDB.pm - based on Kernel/System/DB.pm without global configurations
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Mario(dot)Illinger(at)cape(dash)it(dot)de
-# * Anna(dot)Litvinova(at)cape(dash)it(dot)de
-#
-# Depends: OTRS, Kernel/System/DB.pm, 5.0.4
-#
-# --
-# This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
-# --
 
 package Kernel::System::DFRemoteDB;
 ## nofilter(TidyAll::Plugin::OTRS::Perl::PODSpelling)
@@ -438,11 +423,6 @@ sub Prepare {
     my $SQL   = $Param{SQL};
     my $Limit = $Param{Limit} || '';
     my $Start = $Param{Start} || '';
-
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => " CHEGOU AQUI 3 ".$SQL,
-            );
 
     # check needed stuff
     if ( !$Param{SQL} ) {
