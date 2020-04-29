@@ -457,6 +457,7 @@ sub EditFieldRender {
 END
 
     my $ValueCounter = 0;
+    my $ScriptItems = "";
     for my $Key ( @{ $SelectedValuesArrayRef } ) {
         next if (!$Key);
         $ValueCounter++;
@@ -479,12 +480,21 @@ END
         </div>
 END
 
-        
+
+my $ClearAdditional1 = "";
+        if($Param{DynamicFieldConfig}->{Config}->{PossibleValues}){
+            foreach my $key (sort keys %{$Param{DynamicFieldConfig}->{Config}->{PossibleValues}}) {
+                $ClearAdditional1 .= <<"END";
+        \$('#DynamicField_$key').val('');
+END
+            }
+        }
     
 
-        $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
+        $ScriptItems.= <<"END";
             
             \$('#$ValueFieldName$ValueCounter').siblings('div.Remove').find('a').bind('click', function() {
+                $ClearAdditional1
                 \$('#$ValueFieldName$ValueCounter').parent().remove();
                 if (\$('.InputField_Selection > input[name=$FieldName]').length == 0) {
                     \$('#$ContainerFieldName').hide().append(
@@ -530,8 +540,10 @@ my $ClearAdditional = "";
 END
             }
         }
-
-    $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
+    $HTMLString .= <<"END";
+        <script>
+            function initScript$AutoCompleteFieldName(){
+                $ScriptItems
     var $IDCounterName = $ValueCounter;
     \$('#$AutoCompleteFieldName').autocomplete({
         delay: $FieldConfig->{QueryDelay},
@@ -775,6 +787,14 @@ END
             }, undefined, false);
         }
     });
+            }
+            if(document.readyState === 'complete')
+                initScript$AutoCompleteFieldName();
+        </script>
+END
+
+    $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
+    initScript$AutoCompleteFieldName();
 END
 
     if ( $Param{Mandatory} ) {
