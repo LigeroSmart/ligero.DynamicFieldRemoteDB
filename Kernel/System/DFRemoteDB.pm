@@ -208,12 +208,14 @@ sub Connect {
         );
     }
 
+    $Self->{Backend}->{'DB::Attribute'}->{ora_charset} = 'AL32UTF8';
+
     # db connect
     $Self->{dbh} = DBI->connect(
         $Self->{DSN},
         $Self->{USER},
         $Self->{PW},
-        $Self->{Backend}->{'DB::Attribute'},
+        $Self->{Backend}->{'DB::Attribute'}
     );
 
     if ( !$Self->{dbh} ) {
