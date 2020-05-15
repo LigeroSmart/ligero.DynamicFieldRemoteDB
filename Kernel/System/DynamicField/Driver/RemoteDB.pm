@@ -525,7 +525,7 @@ END
     if($Param{DynamicFieldConfig}->{Config}->{AdditionalFieldRO}){
         if($Param{DynamicFieldConfig}->{Config}->{PossibleValues}){
             foreach my $key (sort keys %{$Param{DynamicFieldConfig}->{Config}->{PossibleValues}}) {
-                $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
+                $ScriptItems.= <<"END";
                 \$('#DynamicField_$key').attr('readonly', true);
 END
             }
