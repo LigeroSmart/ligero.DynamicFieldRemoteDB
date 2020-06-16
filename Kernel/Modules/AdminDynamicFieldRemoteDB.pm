@@ -185,7 +185,7 @@ sub _AddAction {
             ObjectType ObjectTypeName FieldType FieldTypeName ValidID
             DatabaseFieldValue CacheTTL CachePossibleValues
             ShowKeyInTitle AgentLink CustomerLink
-            DatabaseFieldSearch SearchPrefix SearchSuffix Constrictions
+            DatabaseFieldSearch SearchPrefix SearchSuffix Constrictions AdditionalFilters
             MinQueryLength QueryDelay MaxQueryResult CaseSensitive
         )
     ) {
@@ -281,6 +281,7 @@ sub _AddAction {
         AgentLink           => $GetParam{AgentLink}           || '',
         CustomerLink        => $GetParam{CustomerLink}        || '',
         Constrictions       => $GetParam{Constrictions}       || '',
+        AdditionalFilters       => $GetParam{AdditionalFilters}       || '',
         MinQueryLength      => $GetParam{MinQueryLength}      || 3,
         QueryDelay          => $GetParam{QueryDelay}          || 300,
         MaxQueryResult      => $GetParam{MaxQueryResult}      || 10,
@@ -471,7 +472,7 @@ sub _ChangeAction {
             ObjectType ObjectTypeName FieldType FieldTypeName ValidID
             DatabaseFieldValue CacheTTL CachePossibleValues
             ShowKeyInTitle AgentLink CustomerLink
-            DatabaseFieldSearch SearchPrefix SearchSuffix Constrictions
+            DatabaseFieldSearch SearchPrefix SearchSuffix Constrictions AdditionalFilters
             MinQueryLength QueryDelay MaxQueryResult CaseSensitive
         )
     ) {
@@ -568,6 +569,7 @@ sub _ChangeAction {
         AgentLink           => $GetParam{AgentLink}           || '',
         CustomerLink        => $GetParam{CustomerLink}        || '',
         Constrictions       => $GetParam{Constrictions}       || '',
+        AdditionalFilters       => $GetParam{AdditionalFilters}       || '',
         MinQueryLength      => $GetParam{MinQueryLength}      || 3,
         QueryDelay          => $GetParam{QueryDelay}          || 300,
         MaxQueryResult      => $GetParam{MaxQueryResult}      || 10,
@@ -626,6 +628,7 @@ sub _ShowScreen {
     $Param{AgentLink}           = $Param{Config}->{AgentLink}           || '';
     $Param{CustomerLink}        = $Param{Config}->{CustomerLink}        || '';
     $Param{Constrictions}       = $Param{Config}->{Constrictions}       || '';
+    $Param{AdditionalFilters}       = $Param{Config}->{AdditionalFilters}       || '';
     $Param{MinQueryLength}      = $Param{Config}->{MinQueryLength}      || 3;
     $Param{QueryDelay}          = $Param{Config}->{QueryDelay}          || 300;
     $Param{MaxQueryResult}      = $Param{Config}->{MaxQueryResult}      || 10;
@@ -970,6 +973,9 @@ sub _DefaultValueSearch {
 
         # get used Constrictions
         my $Constrictions = $Self->{ParamObject}->GetParam( Param => 'Constrictions' ) || '';
+
+        # get used AdditionalFilters
+        my $AdditionalFilters = $Self->{ParamObject}->GetParam( Param => 'AdditionalFilters' ) || '';
 
         # get used entries
         my @Entries = $Self->{ParamObject}->GetArray( Param => 'DefaultValues' );

@@ -90,6 +90,13 @@ sub Run {
         if ($Subaction eq 'Search') {
             my $Search = $Self->{ParamObject}->GetParam( Param => 'Search' ) || '';
 
+            my $AdditionalFilters = $Self->{ParamObject}->GetParam( Param => 'AdditionalFilters' ) || '';
+
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "CHEGOU AQUI SEARCH ".$AdditionalFilters
+            );
+
             # encode the input
             $Self->{EncodeObject}->EncodeInput( \$Search );
 
@@ -264,7 +271,8 @@ sub Run {
                         . ' FROM '
                         . $DynamicFieldConfig->{Config}->{DatabaseTable}
                         . ' WHERE '
-                        . $QueryCondition;
+                        . $QueryCondition
+                        . $AdditionalFilters;
 
                     # create cache object
                     if ( $DynamicFieldConfig->{Config}->{CacheTTL} ) {

@@ -555,6 +555,24 @@ END
             Data.Search         = Request.term;
             Data.DynamicFieldID = $FieldID;
 
+            var additionalFilter = '$Param{DynamicFieldConfig}->{Config}->{AdditionalFilters}';
+
+            if(additionalFilter !== ""){
+
+                var addFilterList = additionalFilter.split(",");
+
+                Data.AdditionalFilters = "";
+
+                for(var item of addFilterList){
+                    var columnName = item.split("=")[0];
+                    var fieldName = item.split("=")[1];
+                    var fieldValue = \$('[name ="'+fieldName+'"]').val();
+                    Data.AdditionalFilters += " AND "+columnName+"='"+fieldValue+"'";
+                }
+
+                console.log("Passou por aqui",Data);
+            }
+
             var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
             \$.each(Data, function (Key, Value) {
                 QueryString += ';' + encodeURIComponent(Key) + '=' + encodeURIComponent(Value);

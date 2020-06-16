@@ -528,6 +528,12 @@ if ($('input[name=DefaultValues]').length >= $('#MaxArraySize').val()) {
                             <p class="FieldExplanation">[% Translate("Define all additional as ready only.") | html %]</p>
                         </div>
                         <div class="Clear"></div>
+                        <label for="AdditionalFilters">[% Translate("Additional Filters") | html %]:</label>
+                        <div class="Field">
+                            <textarea id="AdditionalFilters" class="W50p [% Data.AdditionalFiltersServerError | html %]" name="AdditionalFilters" rows="4" cols="100">[% Data.AdditionalFilters | html %]</textarea>
+                            <p class="FieldExplanation">[% Translate("Specify Additional Filters for search-queries separated by comma. [ColumnName1]=[FieldName1],[ColumnName2]=[FieldName2]. Example: COLUMN_TEST=DynamicField_Test") | html %]</p>
+                        </div>
+                        <div class="Clear"></div>
                     </fieldset>
                 </div>
 

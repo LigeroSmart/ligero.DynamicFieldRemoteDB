@@ -110,6 +110,10 @@ sub Data {
     $Lang->{'Additional Fields as Read Only'} = 'Campos adicionais como somente leitura';
     $Lang->{'Define all additional as ready only.'} = 'Define todos os campos adicionais como somente leitura.';
 
+    $Lang->{'Additional Filters'} = 'Filtros Adicionais';
+    $Lang->{'Specify Additional Filters for search-queries separated by comma. [ColumnName1]=[FieldName1],[ColumnName2]=[FieldName2]. Example: COLUMN_TEST=DynamicField_Test'} = 
+    'Especifique Filtros Adicionais para query de pesquisa separados por virgula. [ColumnName1]=[FieldName1],[ColumnName2]=[FieldName2]. Exemplo: COLUMN_TEST=DynamicField_Test';
+
     return 0;
 
     # $$STOP$$
