@@ -569,8 +569,6 @@ END
                     var fieldValue = \$('[name ="'+fieldName+'"]').val();
                     Data.AdditionalFilters += " AND "+columnName+"='"+fieldValue+"'";
                 }
-
-                console.log("Passou por aqui",Data);
             }
 
             var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
