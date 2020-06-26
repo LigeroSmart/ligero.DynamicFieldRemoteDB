@@ -625,6 +625,7 @@ END
                 + '">x</a></div><div class="Clear"></div>'
                 + '</div>'
             );
+            \$("#$ValueFieldName"+"Validate").attr("value",UI.item.key);
             \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').data('counter', $IDCounterName);
             \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').bind('click', function() {
                 $ClearAdditional
@@ -803,6 +804,7 @@ END
             }, undefined, false);
         }
     });
+    
             }
             if(document.readyState === 'complete')
                 initScript$AutoCompleteFieldName();
