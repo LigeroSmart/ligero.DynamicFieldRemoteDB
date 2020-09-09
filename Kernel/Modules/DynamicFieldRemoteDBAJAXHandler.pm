@@ -92,11 +92,6 @@ sub Run {
 
             my $AdditionalFilters = $Self->{ParamObject}->GetParam( Param => 'AdditionalFilters' ) || '';
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "CHEGOU AQUI SEARCH ".$AdditionalFilters
-            );
-
             # encode the input
             $Self->{EncodeObject}->EncodeInput( \$Search );
 
