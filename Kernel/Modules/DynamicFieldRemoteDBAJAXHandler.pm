@@ -325,7 +325,7 @@ sub Run {
                             if($DynamicFieldConfig->{Config}->{PossibleValues}){
                                 my $count = 2;
                                 foreach my $key (sort keys %{$DynamicFieldConfig->{Config}->{PossibleValues}}) {
-                                    push $result->{"AditionalField"},{
+                                    push @{$result->{"AditionalField"}},{
                                         field => "DynamicField_".$key,
                                         value => $Row[$count]
                                     };
