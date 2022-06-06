@@ -651,6 +651,9 @@ END
             if(UI.item.saveDescription == 0)
                 \$('#$FieldName').trigger('change');
             Event.preventDefault();
+            for (let field of UI.item.aditionalFields) {
+                 \$('#'+field.field).trigger('change');
+            }
             return false;
         },
     });
