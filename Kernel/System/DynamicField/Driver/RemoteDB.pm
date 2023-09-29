@@ -482,6 +482,7 @@ END
 					data: Data$Key
 				}
 			});
+			\$('#$ContainerFieldName').append('<input type="hidden" name="$FieldName" value="' + Data$Key.id + '" />');
 END
 	}
     my $ValidValue = "";
@@ -596,7 +597,11 @@ END
 		}
 		
 	});
-
+	\$('#$AutoCompleteFieldName').on('select2:unselect', function (e) {
+		var data = e.params.data;
+		console.log('unselect', data);
+		\$('input[name=$FieldName][value='+data.id+']').remove();
+	});
     \$('#$ValidateFieldName').closest('form').bind('submit', function() {
         if ( \$('#$ValidateFieldName').hasClass('Error') ) {
             \$('label[for=$FieldName]').addClass('LabelError');
