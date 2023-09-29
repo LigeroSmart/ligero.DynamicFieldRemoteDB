@@ -450,73 +450,46 @@ sub EditFieldRender {
     my $HTMLString = <<"END";
     <input id="$FieldName" type="text" style="display:none;" />
     <div class="InputField_Container W50pc">
-        <input id="$AutoCompleteFieldName" type="text" style="margin-bottom:2px;" />
+		<select id="$AutoCompleteFieldName" class="InputField_InputContainer" style="display:block; margin-bottom:2px; width: 100%"></select>
         <span id="AJAXLoader$AutoCompleteFieldName" class="AJAXLoader" style="display: none;"></span>
+		<div id="$ContainerFieldName" style="display:block;"></div>
         <div class="Clear"></div>
-        <div id="$ContainerFieldName" class="InputField_InputContainer" style="display:block;">
 END
 
     my $ValueCounter = 0;
     my $ScriptItems = "";
-    for my $Key ( @{ $SelectedValuesArrayRef } ) {
-        next if (!$Key);
-        $ValueCounter++;
+	for my $Key ( @{ $SelectedValuesArrayRef } ) { 
+		next if (!$Key);
 
-        my $Label = $Self->ValueLookup(
+		my $Label = $Self->ValueLookup(
             %Param,
             Key => $Key,
         );
-
-        my $Title = $Label;
-        if ( $Param{DynamicFieldConfig}->{Config}->{ShowKeyInTitle} ) {
-            $Title .= ' (' . $Key . ')';
-        }
-
-        $HTMLString .= <<"END";
-        <div class="InputField_Selection" style="display:block;position:inherit;top:0px;">
-            <input id="$ValueFieldName$ValueCounter" type="hidden" name="$FieldName" value="$Key" />
-            <div class="Text" title="$Title">$Label</div><div class="Remove"><a href="#" role="button" title="$TranslateRemoveSelection" tabindex="-1" aria-label="$TranslateRemoveSelection: $Label">x</a></div>
-            <div class="Clear"></div>
-        </div>
+		$ScriptItems .= <<"END";
+			var Data$Key;
+			Data$Key = {
+				id:   $Key,
+				text: '$Label',
+				title: '$Label',
+				aditionalFields: [],
+			};
+			var select$Key = \$('#$AutoCompleteFieldName');
+			var option$Key = new Option(Data$Key.text, Data$Key.id, true, true);
+			select$Key.append(option$Key).trigger('change');
+			select$Key.trigger({
+				type: 'select2:select',
+				params: {
+					data: Data$Key
+				}
+			});
 END
-
-
-my $ClearAdditional1 = "";
-        if($Param{DynamicFieldConfig}->{Config}->{PossibleValues}){
-            foreach my $key (sort keys %{$Param{DynamicFieldConfig}->{Config}->{PossibleValues}}) {
-                $ClearAdditional1 .= <<"END";
-        \$('#DynamicField_$key').val('');
-END
-            }
-        }
-    
-
-        $ScriptItems.= <<"END";
-            
-            \$('#$ValueFieldName$ValueCounter').siblings('div.Remove').find('a').bind('click', function() {
-                $ClearAdditional1
-                \$('#$ValueFieldName$ValueCounter').parent().remove();
-                if (\$('.InputField_Selection > input[name=$FieldName]').length == 0) {
-                    \$('#$ContainerFieldName').hide().append(
-                        '<input class="InputField_Dummy" type="hidden" name="$FieldName" value="" />'
-                    );
-                }
-                if (\$('.InputField_Selection > input[name=$FieldName]').length < $MaxArraySize) {
-                    \$('#$AutoCompleteFieldName').show();
-                }
-                \$('#$FieldName').trigger('change');
-                return false;
-            });
-END
-    }
-
+	}
     my $ValidValue = "";
     if($ValueCounter){
        $ValidValue = '1';
     }
 
     $HTMLString .= <<"END";
-        </div>
         <input id="$ValidateFieldName" type="text" class="$FieldClass" value="$ValidValue" style="display:none;" />
         <div class="Clear"></div>
     </div>
@@ -543,222 +516,86 @@ END
     $HTMLString .= <<"END";
         <script>
             function initScript$AutoCompleteFieldName(){
-                $ScriptItems
+                
     var $IDCounterName = $ValueCounter;
-    \$('#$AutoCompleteFieldName').autocomplete({
-        delay: $FieldConfig->{QueryDelay},
-        minLength: $FieldConfig->{MinQueryLength},
-        source: function (Request, Response) {
-            var Data = {};
-            Data.Action         = 'DynamicFieldRemoteDBAJAXHandler';
-            Data.Subaction      = 'Search';
-            Data.Search         = Request.term;
-            Data.DynamicFieldID = $FieldID;
+	\$('#$AutoCompleteFieldName').select2({
+		templateSelection: function (data, container) {
+			\$(data.element).attr('data-custom-title', data.title);
+			\$(data.element).attr('data-custom-aditional-fields', JSON.stringify(data.aditionalFields));
+			\$(data.element).attr('data-custom-save-description', data.saveDescription);
+    		return data.text;
+		},
+		allowClear: true,
+		placeholder: 'selecione um valor',
+		multiple: $MaxArraySize > 1,
+		maximumSelectionLength: $MaxArraySize,
+		ajax: {
+			processResults: function (data) {
+				return {
+				results: data
+				};
+			},
+			transport: function (params, success, failure) {
+				var Data = {};
+				Data.Action         = 'DynamicFieldRemoteDBAJAXHandler';
+				Data.Subaction      = 'Search';
+				Data.Search         = params.data.term ?? '';
+				Data.DynamicFieldID = $FieldID;
 
-            var additionalFilter = '$Param{DynamicFieldConfig}->{Config}->{AdditionalFilters}';
+				var additionalFilter = '$Param{DynamicFieldConfig}->{Config}->{AdditionalFilters}';
 
-            if(additionalFilter !== ""){
+				if(additionalFilter !== ""){
 
-                var addFilterList = additionalFilter.split(",");
+					var addFilterList = additionalFilter.split(",");
 
-                Data.AdditionalFilters = "";
+					Data.AdditionalFilters = "";
 
-                for(var item of addFilterList){
-                    var columnName = item.split("=")[0];
-                    var fieldName = item.split("=")[1];
-                    var fieldValue = \$('[name ="'+fieldName+'"]').val();
-                    Data.AdditionalFilters += " AND "+columnName+"='"+fieldValue+"'";
-                }
-            }
+					for(var item of addFilterList){
+						var columnName = item.split("=")[0];
+						var fieldName = item.split("=")[1];
+						var fieldValue = \$('[name ="'+fieldName+'"]').val();
+						Data.AdditionalFilters += " AND "+columnName+"='"+fieldValue+"'";
+					}
+				}
 
-            var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
-            \$.each(Data, function (Key, Value) {
-                QueryString += ';' + encodeURIComponent(Key) + '=' + encodeURIComponent(Value);
-            });
+				var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
+				\$.each(Data, function (Key, Value) {
+					QueryString += ';' + encodeURIComponent(Key) + '=' + encodeURIComponent(Value);
+				});
 
-            if (\$('#$AutoCompleteFieldName').data('AutoCompleteXHR')) {
-                \$('#$AutoCompleteFieldName').data('AutoCompleteXHR').abort();
-                \$('#$AutoCompleteFieldName').removeData('AutoCompleteXHR');
-            }
-            \$('#AJAXLoader$AutoCompleteFieldName').show();
-            \$('#$AutoCompleteFieldName').data('AutoCompleteXHR', Core.AJAX.FunctionCall(Core.Config.Get('CGIHandle'), QueryString, function (Result) {
-                var Data = [];
-                \$.each(Result, function () {
-                    Data.push({
-                        key:   this.Key,
-                        value: this.Value,
-                        title: this.Title,
-                        aditionalFields: this.AditionalField,
-                        saveDescription: this.SaveDescription
-                    });
-                });
-                \$('#$AutoCompleteFieldName').data('AutoCompleteData', Data);
-                \$('#$AutoCompleteFieldName').removeData('AutoCompleteXHR');
-                \$('#AJAXLoader$AutoCompleteFieldName').hide();
-                Response(Data);
-            }).fail(function() {
-                \$('#AJAXLoader$AutoCompleteFieldName').hide();
-                Response(\$('#$AutoCompleteFieldName').data('AutoCompleteData'));
-            }));
-        },
-        select: function (Event, UI) {
-            if(UI.item.aditionalFields.length > 0){
-                for (let field of UI.item.aditionalFields) {
-                    \$('#'+field.field).val(field.value);
-                }
-            }
-            $IDCounterName++;
-            \$('#$ContainerFieldName').append(
-                '<div class="InputField_Selection" style="display:block;position:inherit;top:0px;">'
-                + '<input id="$ValueFieldName'
-                + $IDCounterName
-                + '" type="hidden" name="$FieldName" value="'
-                + UI.item.key
-                + '" />'
-                + '<div class="Text" title="'
-                + UI.item.title
-                + '">'
-                + UI.item.value
-                + '</div>'
-                + '<div class="Remove"><a href="#" role="button" title="$TranslateRemoveSelection" tabindex="-1" aria-label="$TranslateRemoveSelection: '
-                + UI.item.value
-                + '">x</a></div><div class="Clear"></div>'
-                + '</div>'
-            );
-            \$("#$ValueFieldName"+"Validate").attr("value",UI.item.key);
-            \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').data('counter', $IDCounterName);
-            \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').bind('click', function() {
-                $ClearAdditional
-                \$('#$ValueFieldName' + \$(this).data('counter')).parent().remove();
-                if (\$('.InputField_Selection > input[name=$FieldName]').length == 0) {
-                    \$('#$ContainerFieldName').hide().append(
-                        '<input class="InputField_Dummy" type="hidden" name="$FieldName" value="" />'
-                    );
-                }
-                if (\$('.InputField_Selection > input[name=$FieldName]').length < $MaxArraySize) {
-                    \$('#$AutoCompleteFieldName').show();
-                }
-                if(UI.item.saveDescription == 0)
-                    \$('#$FieldName').trigger('change');
-                return false;
-            });
-            \$('#$ContainerFieldName').show();
-            \$('#$ContainerFieldName > .InputField_Dummy').remove();
-            \$('#$AutoCompleteFieldName').val('');
-            if (\$('.InputField_Selection > input[name=$FieldName]').length >= $MaxArraySize) {
-                \$('#$AutoCompleteFieldName').hide();
-            }
-            if(UI.item.saveDescription == 0)
-                \$('#$FieldName').trigger('change');
-            Event.preventDefault();
-            for (let field of UI.item.aditionalFields) {
-                 \$('#'+field.field).trigger('change');
-            }
-            return false;
-        },
-    });
-    \$('#$AutoCompleteFieldName').blur(function() {
-        \$(this).val('');
-        if ( \$('#$ValidateFieldName').hasClass('Error') ) {
-            \$('label[for=$FieldName]').addClass('LabelError');
-            \$('#$AutoCompleteFieldName').addClass('Error');
-        } else {
-            \$('label[for=$FieldName]').removeClass('LabelError');
-            \$('#$AutoCompleteFieldName').removeClass('Error');
-        }
-    });
-    \$('#$FieldName').change(function() {
-        if (\$('#$FieldName').data('AJAXRequest')) {
-            \$('#$FieldName').data('AJAXRequest').abort();
-            \$('#$FieldName').removeData('AJAXRequest');
-        }
-
-        \$('#$ValidateFieldName').val('');
-        \$('.InputField_Selection > input[name=$FieldName]').each(function () {
-            if(\$(this).val()){
-                \$('#$ValidateFieldName').removeClass('Error');
-                \$('#$ValidateFieldName').val('1');
-                return false;
-            }
-        });
-
-        if (\$('#$FieldName').val().length == 0) {
-            return false;
-        }
-
-        var Data = {};
-        Data.Action         = 'DynamicFieldRemoteDBAJAXHandler';
-        Data.Subaction      = 'AddValue';
-        Data.Key            = \$('#$FieldName').val();
-        Data.DynamicFieldID = $FieldID;
-
-        var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
-        \$.each(Data, function (Key, Value) {
-            QueryString += ';' + encodeURIComponent(Key) + '=' + encodeURIComponent(Value);
-        });
-
-        \$('#$FieldName').data('AJAXRequest', \$.ajax({
-            type: 'POST',
-            url: Core.Config.Get('CGIHandle'),
-            data: QueryString,
-            dataType: 'html',
-            async: false,
-            success: function (Response) {
-                if (Response) {
-                    var Result = jQuery.parseJSON(Response);
-                    \$('#$FieldName').val('');
-                    while (\$('.InputField_Selection > input[name=$FieldName]').length >= $MaxArraySize) {
-                        \$('.InputField_Selection > input[name=$FieldName]').last().siblings('div.Remove').find('a').trigger('click');
-                    }
-                    $IDCounterName++;
-                    \$('#$ContainerFieldName').append(
-                        '<div class="InputField_Selection" style="display:block;position:inherit;top:0px;">'
-                        + '<input id="$ValueFieldName'
-                        + $IDCounterName
-                        + '" type="hidden" name="$FieldName" value="'
-                        + Result.Key
-                        + '" />'
-                        + '<div class="Text" title="'
-                        + Result.Title
-                        + '">'
-                        + Result.Value
-                        + '</div>'
-                        + '<div class="Remove"><a href="#" role="button" title="$TranslateRemoveSelection" tabindex="-1" aria-label="$TranslateRemoveSelection: '
-                        + Result.Value
-                        + '">x</a></div><div class="Clear"></div>'
-                        + '</div>'
-                    );
-                    \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').data('counter', $IDCounterName);
-                    \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').bind('click', function() {
-                        \$('#$ValueFieldName' + \$(this).data('counter')).parent().remove();
-                        if (\$('.InputField_Selection > input[name=$FieldName]').length == 0) {
-                            \$('#$ContainerFieldName').hide().append(
-                                '<input class="InputField_Dummy" type="hidden" name="$FieldName" value="" />'
-                            );
-                        }
-                        if (\$('.InputField_Selection > input[name=$FieldName]').length < $MaxArraySize) {
-                            \$('#$AutoCompleteFieldName').show();
-                        }
-                        \$('#$FieldName').trigger('change');
-                        return false;
-                    });
-                    \$('#$ContainerFieldName').show();
-                    \$('#$ContainerFieldName > .InputField_Dummy').remove();
-                    \$('#$AutoCompleteFieldName').val('');
-                    if (\$('.InputField_Selection > input[name=$FieldName]').length >= $MaxArraySize) {
-                        \$('#$AutoCompleteFieldName').hide();
-                    }
-                    \$('#$FieldName').trigger('change');
-                    return false;
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                if (textStatus != 'abort') {
-                    alert('Error thrown by AJAX: ' + textStatus + ': ' + errorThrown);
-                }
-            }
-        }));
-    });
+				\$('#AJAXLoader$AutoCompleteFieldName').show();
+				Core.AJAX.FunctionCall(Core.Config.Get('CGIHandle'), QueryString, function (Result) {
+					var Data = [];
+					\$.each(Result, function () {
+						Data.push({
+							id:   this.Key,
+							text: this.Value,
+							title: this.Title,
+							aditionalFields: this.AditionalField,
+							saveDescription: this.SaveDescription
+						});
+					});
+					\$('#AJAXLoader$AutoCompleteFieldName').hide();
+					success(Data);
+				})
+			}
+		}
+	});
+	$ScriptItems
+	\$('#$AutoCompleteFieldName').on('select2:select', function (e) {
+		var data = e.params.data;
+		for (let field of data.aditionalFields) {
+			\$('#'+field.field).val(field.value);
+		}
+		\$("#$ValueFieldName"+"Validate").attr("value",data.id);
+		\$('#$ContainerFieldName').append('<input type="hidden" name="$FieldName" value="' + data.id + '" />');
+		if(data.saveDescription == 0)
+			\$('#$FieldName').trigger('change');
+		for (let field of data.aditionalFields) {
+				\$('#'+field.field).trigger('change');
+		}
+		
+	});
 
     \$('#$ValidateFieldName').closest('form').bind('submit', function() {
         if ( \$('#$ValidateFieldName').hasClass('Error') ) {
@@ -767,44 +604,6 @@ END
         } else {
             \$('label[for=$FieldName]').removeClass('LabelError');
             \$('#$AutoCompleteFieldName').removeClass('Error');
-        }
-    });
-
-    if (\$('.InputField_Selection > input[name=$FieldName]').length == 0) {
-        \$('#$ContainerFieldName').hide().append(
-            '<input class="InputField_Dummy" type="hidden" name="$FieldName" value="" />'
-        );
-    }
-    if (\$('.InputField_Selection > input[name=$FieldName]').length >= $MaxArraySize) {
-        \$('#$AutoCompleteFieldName').hide();
-    }
-    Core.App.Subscribe('Event.AJAX.FormUpdate.Callback', function (Request, Response) {
-        var Data = {};
-        Data.Action         = 'DynamicFieldRemoteDBAJAXHandler';
-        Data.Subaction      = 'PossibleValueCheck';
-        Data.DynamicFieldID = $FieldID;
-
-        var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
-        \$.each(Data, function (Key, Value) {
-            QueryString += ';' + encodeURIComponent(Key) + '=' + encodeURIComponent(Value);
-        });
-
-        if (\$('#$FieldName').data('PossibleValueCheck') != QueryString) {
-            \$('#$FieldName').data('PossibleValueCheck', QueryString);
-            Core.AJAX.FunctionCall(Core.Config.Get('CGIHandle'), QueryString, function (Response) {
-                \$('.InputField_Selection > input[name=$FieldName]').each(function() {
-                    var Found = 0;
-                    var \$Element = \$(this);
-                    \$.each(Response, function(Key, Value) {
-                        if ( \$Element.val() == Value ) {
-                            Found = 1;
-                        }
-                    });
-                    if (Found == 0) {
-                        \$Element.last().siblings('div.Remove').find('a').trigger('click');
-                    }
-                });
-            }, undefined, false);
         }
     });
     
@@ -867,7 +666,7 @@ END
         $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
 \$('$FieldSelector').bind('change', function (Event) {
     var CurrentValue = '';
-    \$('.InputField_Selection > input[name=$FieldName]').each(function() {
+    \$('input[name=$FieldName]').each(function() {
         if (CurrentValue.length > 0) {
             CurrentValue += ';';
         }
@@ -1044,6 +843,7 @@ sub SearchFieldRender {
 
     my $HTMLString = <<"END";
     <div class="InputField_Container W50pc">
+		<select id="test" />
         <input id="$AutoCompleteFieldName" type="text" style="margin-bottom:2px;" />
         <div class="Clear"></div>
         <div id="$ContainerFieldName" class="InputField_InputContainer" style="display:block;">

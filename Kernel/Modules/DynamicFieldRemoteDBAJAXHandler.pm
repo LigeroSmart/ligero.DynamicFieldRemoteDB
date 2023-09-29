@@ -88,7 +88,7 @@ sub Run {
 
         #handle subaction Search
         if ($Subaction eq 'Search') {
-            my $Search = $Self->{ParamObject}->GetParam( Param => 'Search' ) || '';
+            my $Search = $Self->{ParamObject}->GetParam( Param => 'Search' ) || '*';
 
             my $AdditionalFilters = $Self->{ParamObject}->GetParam( Param => 'AdditionalFilters' ) || '';
 
