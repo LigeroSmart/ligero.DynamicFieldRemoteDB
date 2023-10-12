@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otrs_package version="1.0">
     <Name>DynamicFieldRemoteDB</Name>
-    <Version>6.1.1</Version>
+    <Version>6.1.2</Version>
     <Framework>6.x.x</Framework>
     <Vendor>Ligero</Vendor>
     <URL>http://www.perl-services.de</URL>
@@ -23,6 +23,7 @@
         <File Permission="644" Location="var/httpd/htdocs/js/Core.Agent.Admin.DynamicFieldRemoteDB.js"></File>
 		<File Permission="644" Location="var/httpd/htdocs/js/thirdparty/select2/select2.min.js"></File>
 		<File Permission="644" Location="var/httpd/htdocs/skins/Agent/default/css/thirdparty/select2/select2.min.css"></File>
+		<File Permission="644" Location="var/httpd/htdocs/skins/Customer/default/css/thirdparty/select2/select2.min.css"></File>
     </Filelist>
     <CodeInstall Type="post"><![CDATA[
         $Kernel::OM->Get('var::packagesetup::' . $Param{Structure}->{Name}->{Content} )->CodeInstall();
